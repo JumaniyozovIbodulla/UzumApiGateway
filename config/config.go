@@ -40,8 +40,8 @@ func Load() Config {
 	c.RedisPort = cast.ToInt(getOrReturnDefault("REDIS_PORT", 6379))
 	c.RedisPassword = cast.ToString(getOrReturnDefault("REDIS_PASSWORD", ""))
 
-	c.OrderServiceHost = cast.ToString(getOrReturnDefault("Order_SERVICE_HOST", "localhost"))
-	c.OrderServicePort = cast.ToString(getOrReturnDefault("Order_GRPC_PORT", "8080"))
+	c.OrderServiceHost = cast.ToString(getOrReturnDefault("Order_SERVICE_HOST", ""))
+	c.OrderServicePort = cast.ToString(getOrReturnDefault("Order_GRPC_PORT", ""))
 	return c
 }
 

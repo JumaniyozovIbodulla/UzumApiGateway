@@ -29,7 +29,9 @@ type ResponseOK struct {
 }
 
 type Response struct {
-	ID interface{} `json:"id"`
+	StatusCode  int
+	Description string
+	Data        interface{}
 }
 
 type ErrorWithDescription struct {

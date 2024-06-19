@@ -22,9 +22,25 @@ type Config struct {
 	Cfg        config.Config
 }
 
+// @title           Swagger Example API
+// @version         1.0
+// @description     This is a sample server celler server.
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8081
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization
+// @externalDocs.description  OpenAPI
+// @externalDocs.url          https://swagger.io/resources/open-api/
+
 func New(cnf Config) *gin.Engine {
 	r := gin.New()
 
@@ -35,7 +51,7 @@ func New(cnf Config) *gin.Engine {
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
 	config.AllowHeaders = append(config.AllowHeaders, "*")
-	// config.AllowOrigins = cnf.Cfg.AllowOrigins
+
 	r.Use(cors.New(config))
 
 	handler := handler.New(&handler.HandlerConfig{
@@ -48,8 +64,26 @@ func New(cnf Config) *gin.Engine {
 		c.JSON(http.StatusOK, gin.H{"data": "Api gateway"})
 	})
 
-	r.POST("/v1/ondemand-order", handler.GetListCategory)
-	
+	// orders
+	r.POST("/api/v1/order", handler.CreateOrder)
+	r.GET("/api/v1/order", handler.GetByIdOrder)
+	r.PUT("/api/v1/order", handler.UpdateOrder)
+	r.DELETE("/api/v1/order", handler.DeleteOrder)
+	r.GET("/api/v1/orders", handler.GetAllOrder)
+
+	// order-products
+	r.POST("/api/v1/orderProduct", handler.CreateOrderProduct)
+	r.GET("/api/v1/orderProduct", handler.GetByIdOrderProduct)
+	r.PUT("/api/v1/orderProduct", handler.UpdateOrderProduct)
+	r.DELETE("/api/v1/orderProduct", handler.DeleteOrderProduct)
+	r.GET("/api/v1/orderProducts", handler.GetAllOrderProducts)
+
+	// order-notes
+	r.POST("/api/v1/orderNote", handler.CreateOrderNotes)
+	r.GET("/api/v1/orderNote", handler.GetByIdOrderNotes)
+	r.PUT("/api/v1/orderNote", handler.UpdateOrderNotes)
+	r.DELETE("/api/v1/orderNote", handler.DeleteOrderNotes)
+	r.GET("/api/v1/orderNotes", handler.GetAllOrderNotes)
 
 	// Shipper endpoints
 	url := ginSwagger.URL("swagger/doc.json") // The url pointing to API definition

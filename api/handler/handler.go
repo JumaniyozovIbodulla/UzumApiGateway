@@ -1,9 +1,12 @@
 package handler
 
 import (
+	"uzumapi/api/models"
 	"uzumapi/config"
 	"uzumapi/pkg/grpc_client"
 	"uzumapi/pkg/logger"
+
+	"github.com/gin-gonic/gin"
 )
 
 type handler struct {
@@ -114,3 +117,27 @@ func New(c *HandlerConfig) *handler {
 // 	}
 // 	return false
 // }
+
+func handleResponse(c *gin.Context, log logger.Logger, msg string, statusCode int, data interface{}) {
+	resp := models.Response{}
+
+	if statusCode >= 100 && statusCode <= 199 {
+		resp.Description = config.ERR_INFORMATION
+	} else if statusCode >= 200 && statusCode <= 299 {
+		resp.Description = config.SUCCESS
+		log.Info("REQUEST SUCCEEDED", logger.Any("msg: ", msg), logger.Int("status: ", statusCode))
+	} else if statusCode >= 300 && statusCode <= 399 {
+		resp.Description = config.ERR_REDIRECTION
+	} else if statusCode >= 400 && statusCode <= 499 {
+		resp.Description = config.ERR_BADREQUEST
+		log.Error("BAD REQUEST", logger.Any("error: ", msg), logger.Any("data: ", data))
+	} else {
+		resp.Description = config.ERR_INTERNAL_SERVER
+		log.Error("ERR_INTERNAL_SERVER", logger.Any("error: ", msg))
+	}
+
+	resp.StatusCode = statusCode
+	resp.Data = data
+
+	c.JSON(resp.StatusCode, resp)
+}
