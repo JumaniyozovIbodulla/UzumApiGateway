@@ -25,18 +25,17 @@ func (h *handler) CreateOrder(c *gin.Context) {
 	order := order_service.CreateOrder{}
 
 	if err := c.ShouldBindJSON(&order); err != nil {
-		handleResponse(c, h.log, "error while reading request body", http.StatusBadRequest, err)
+		handleGrpcErrWithDescription(c, h.log, err, "error while creating an order")
 		return
 	}
 
-	resp, err := h.grpcClient.OrderService().Create(c.Request.Context(), &order)
+	_, err := h.grpcClient.OrderService().Create(c.Request.Context(), &order)
 
 	if err != nil {
-		handleResponse(c, h.log, "error while creating order", http.StatusBadRequest, err.Error())
+		handleGrpcErrWithDescription(c, h.log, err, "error while creating order")
 		return
 	}
-
-	handleResponse(c, h.log, "Order created successfully", http.StatusOK, resp)
+	handleGrpcErrWithDescription(c, h.log, err, "Order created successfully")
 }
 
 // GetByIdOrder godoc
