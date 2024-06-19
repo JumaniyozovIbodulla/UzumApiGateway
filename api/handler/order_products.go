@@ -5,6 +5,7 @@ import (
 	"uzumapi/genproto/order_product_service"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 // CreateOrderProduct godoc
@@ -40,23 +41,27 @@ func (h *handler) CreateOrderProduct(c *gin.Context) {
 
 // GetByIdOrderProduct godoc
 // @Security ApiKeyAuth
-// @Router 		/api/v1/orderProduct [GET]
+// @Router 		/api/v1/orderProduct/{id} [GET]
 // @Summary 	Get an order-product
 // @Description API for getting an order
 // @Tags 		order-products
 // @Accept  	json
 // @Produce  	json
-// @Param		order body order_product_service.OrderProductPrimaryKey true "order-products"
+// @Param		id path string true "id"
 // @Success		200  {object} models.Response
 // @Failure		400  {object} models.Response
 // @Failure 	404  {object} models.Response
 // @Failure 	500  {object} models.Response
 func (h *handler) GetByIdOrderProduct(c *gin.Context) {
-	orderProductId := order_product_service.OrderProductPrimaryKey{}
+	id := c.Param("id")
 
-	if err := c.ShouldBindJSON(&orderProductId); err != nil {
-		handleResponse(c, h.log, "error while reading request body", http.StatusBadRequest, err)
+	if err := uuid.Validate(id); err != nil {
+		handleResponse(c, h.log, "error while validating order productId", http.StatusBadRequest, err.Error())
 		return
+	}
+
+	orderProductId := order_product_service.OrderProductPrimaryKey{
+		Id: id,
 	}
 
 	resp, err := h.grpcClient.OrderProductsService().GetById(c.Request.Context(), &orderProductId)
@@ -101,23 +106,27 @@ func (h *handler) UpdateOrderProduct(c *gin.Context) {
 
 // DeleteOrderProduct godoc
 // @Security ApiKeyAuth
-// @Router 		/api/v1/orderProduct [DELETE]
+// @Router 		/api/v1/orderProduct/{id} [DELETE]
 // @Summary 	Delete an order product
 // @Description API for delete an order product
 // @Tags 		order-products
 // @Accept  	json
 // @Produce  	json
-// @Param		order body order_product_service.OrderProductPrimaryKey true "order-products"
+// @Param		id path string true "id"
 // @Success		200  {object} models.Response
 // @Failure		400  {object} models.Response
 // @Failure 	404  {object} models.Response
 // @Failure 	500  {object} models.Response
 func (h *handler) DeleteOrderProduct(c *gin.Context) {
-	order := order_product_service.OrderProductPrimaryKey{}
+	id := c.Param("id")
 
-	if err := c.ShouldBindJSON(&order); err != nil {
-		handleResponse(c, h.log, "error while reading request body", http.StatusBadRequest, err)
+	if err := uuid.Validate(id); err != nil {
+		handleResponse(c, h.log, "error while validating order productId", http.StatusBadRequest, err.Error())
 		return
+	}
+
+	order := order_product_service.OrderProductPrimaryKey{
+		Id: id,
 	}
 
 	resp, err := h.grpcClient.OrderProductsService().Delete(c.Request.Context(), &order)
@@ -137,17 +146,28 @@ func (h *handler) DeleteOrderProduct(c *gin.Context) {
 // @Tags 		order-products
 // @Accept  	json
 // @Produce  	json
-// @Param		order body order_product_service.GetListOrderProductRequest true "order-products"
+// @Param    	page query int false "page"
+// @Param    	limit query int false "limit"
 // @Success		200  {object} models.Response
 // @Failure		400  {object} models.Response
 // @Failure 	404  {object} models.Response
 // @Failure 	500  {object} models.Response
 func (h *handler) GetAllOrderProducts(c *gin.Context) {
-	orderProduct := order_product_service.GetListOrderProductRequest{}
-
-	if err := c.ShouldBindJSON(&orderProduct); err != nil {
-		handleResponse(c, h.log, "error while reading request body", http.StatusBadRequest, err)
+	page, err := ParsePageQueryParam(c)
+	if err != nil {
+		handleResponse(c, h.log, "error while parsing page", http.StatusBadRequest, err.Error())
 		return
+	}
+	limit, err := ParseLimitQueryParam(c)
+
+	if err != nil {
+		handleResponse(c, h.log, "error while parsing limit", http.StatusBadRequest, err.Error())
+		return
+	}
+
+	orderProduct := order_product_service.GetListOrderProductRequest{
+		Offset: (page - 1) * limit,
+		Limit:  limit,
 	}
 
 	resp, err := h.grpcClient.OrderProductsService().GetAll(c.Request.Context(), &orderProduct)

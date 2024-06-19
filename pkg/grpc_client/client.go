@@ -19,40 +19,57 @@ type GrpcClientI interface {
 	OrderNotes() order_notes.OrderStatusNotesClient
 }
 
-// GrpcClient ...
 type GrpcClient struct {
-	cfg         config.Config
-	connections map[string]interface{}
+	orderService       order_service.OrderServiceClient
+	connOrderProductService order_product_service.OrderProductsClient
+	orderStatusService order_notes.OrderStatusNotesClient
 }
 
 // New ...
 func New(cfg config.Config) (*GrpcClient, error) {
 
-	connOrder, err := grpc.Dial(
+	connOrderService, err := grpc.Dial(
 		fmt.Sprintf("%s%s", cfg.OrderServiceHost, cfg.OrderServicePort),
-		grpc.WithTransportCredentials(insecure.NewCredentials()))
-
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(52428800), grpc.MaxCallSendMsgSize(52428800)),
+	)
 	if err != nil {
-		return nil, fmt.Errorf("order service dial host: %s port:%s err: %s",
-			cfg.OrderServiceHost, cfg.OrderServicePort, err)
+		return nil, err
+	}
+
+	connOrderProductService, err := grpc.Dial(
+		fmt.Sprintf("%s%s", cfg.OrderServiceHost, cfg.OrderServicePort),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(52428800), grpc.MaxCallSendMsgSize(52428800)),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	connOrderStatusService, err := grpc.Dial(
+		fmt.Sprintf("%s%s", cfg.OrderServiceHost, cfg.OrderServicePort),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(52428800), grpc.MaxCallSendMsgSize(52428800)),
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	return &GrpcClient{
-		cfg: cfg,
-		connections: map[string]interface{}{
-			"order_service": order_service.NewOrderServiceClient(connOrder),
-		},
+		orderService:       order_service.NewOrderServiceClient(connOrderService),
+		connOrderProductService: order_product_service.NewOrderProductsClient(connOrderProductService),
+		orderStatusService: order_notes.NewOrderStatusNotesClient(connOrderStatusService),
 	}, nil
 }
 
 func (g *GrpcClient) OrderService() order_service.OrderServiceClient {
-	return g.connections["order_service"].(order_service.OrderServiceClient)
+	return g.orderService
 }
 
 func (g *GrpcClient) OrderProductsService() order_product_service.OrderProductsClient {
-	return g.connections["order_product_service"].(order_product_service.OrderProductsClient)
+	return g.connOrderProductService
 }
 
 func (g *GrpcClient) OrderProductNotesService() order_notes.OrderStatusNotesClient {
-	return g.connections["order_notes"].(order_notes.OrderStatusNotesClient)
+	return g.orderStatusService
 }

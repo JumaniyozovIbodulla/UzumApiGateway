@@ -5,6 +5,7 @@ import (
 	"uzumapi/genproto/order_notes"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 // CreateOrderNotes godoc
@@ -40,23 +41,27 @@ func (h *handler) CreateOrderNotes(c *gin.Context) {
 
 // GetByIdOrderNotes godoc
 // @Security ApiKeyAuth
-// @Router 		/api/v1/orderNote [GET]
+// @Router 		/api/v1/orderNote/{id} [GET]
 // @Summary 	Get an order notes
 // @Description API for getting an order notes
 // @Tags 		order-notes
 // @Accept  	json
 // @Produce  	json
-// @Param		order body order_notes.OrderNotesPrimaryKey true "order-notes"
+// @Param		id path string true "id"
 // @Success		200  {object} models.Response
 // @Failure		400  {object} models.Response
 // @Failure 	404  {object} models.Response
 // @Failure 	500  {object} models.Response
 func (h *handler) GetByIdOrderNotes(c *gin.Context) {
-	orderNotes := order_notes.OrderNotesPrimaryKey{}
+	id := c.Param("id")
 
-	if err := c.ShouldBindJSON(&orderNotes); err != nil {
-		handleResponse(c, h.log, "error while reading request body", http.StatusBadRequest, err)
+	if err := uuid.Validate(id); err != nil {
+		handleResponse(c, h.log, "error while validating order notes id", http.StatusBadRequest, err.Error())
 		return
+	}
+
+	orderNotes := order_notes.OrderNotesPrimaryKey{
+		Id: id,
 	}
 
 	resp, err := h.grpcClient.OrderProductNotesService().GetById(c.Request.Context(), &orderNotes)
@@ -101,23 +106,27 @@ func (h *handler) UpdateOrderNotes(c *gin.Context) {
 
 // DeleteOrderNotes godoc
 // @Security ApiKeyAuth
-// @Router 		/api/v1/orderNote [DELETE]
+// @Router 		/api/v1/orderNote/{id} [DELETE]
 // @Summary 	Delete an order notes
 // @Description API for delete an order notes
 // @Tags 		order-notes
 // @Accept  	json
 // @Produce  	json
-// @Param		order body order_notes.OrderNotesPrimaryKey true "order-notes"
+// @Param		id path string true "id"
 // @Success		200  {object} models.Response
 // @Failure		400  {object} models.Response
 // @Failure 	404  {object} models.Response
 // @Failure 	500  {object} models.Response
 func (h *handler) DeleteOrderNotes(c *gin.Context) {
-	orderNotesPk := order_notes.OrderNotesPrimaryKey{}
+	id := c.Param("id")
 
-	if err := c.ShouldBindJSON(&orderNotesPk); err != nil {
-		handleResponse(c, h.log, "error while reading request body", http.StatusBadRequest, err)
+	if err := uuid.Validate(id); err != nil {
+		handleResponse(c, h.log, "error while validating order notes id", http.StatusBadRequest, err.Error())
 		return
+	}
+
+	orderNotesPk := order_notes.OrderNotesPrimaryKey{
+		Id: id,
 	}
 
 	resp, err := h.grpcClient.OrderProductNotesService().Delete(c.Request.Context(), &orderNotesPk)
@@ -137,17 +146,29 @@ func (h *handler) DeleteOrderNotes(c *gin.Context) {
 // @Tags 		order-notes
 // @Accept  	json
 // @Produce  	json
-// @Param		order body order_notes.GetListOrderNotesRequest true "order-notes"
+// @Param    	page query int false "page"
+// @Param    	limit query int false "limit"
 // @Success		200  {object} models.Response
 // @Failure		400  {object} models.Response
 // @Failure 	404  {object} models.Response
 // @Failure 	500  {object} models.Response
 func (h *handler) GetAllOrderNotes(c *gin.Context) {
-	orderNotes := order_notes.GetListOrderNotesRequest{}
-
-	if err := c.ShouldBindJSON(&orderNotes); err != nil {
-		handleResponse(c, h.log, "error while reading request body", http.StatusBadRequest, err)
+	page, err := ParsePageQueryParam(c)
+	if err != nil {
+		handleResponse(c, h.log, "error while parsing page", http.StatusBadRequest, err.Error())
 		return
+	}
+
+	limit, err := ParseLimitQueryParam(c)
+
+	if err != nil {
+		handleResponse(c, h.log, "error while parsing limit", http.StatusBadRequest, err.Error())
+		return
+	}
+
+	orderNotes := order_notes.GetListOrderNotesRequest{
+		Offset: (page - 1) * limit,
+		Limit:  limit,
 	}
 
 	resp, err := h.grpcClient.OrderProductNotesService().GetAll(c.Request.Context(), &orderNotes)

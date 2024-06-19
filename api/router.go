@@ -66,23 +66,23 @@ func New(cnf Config) *gin.Engine {
 
 	// orders
 	r.POST("/api/v1/order", handler.CreateOrder)
-	r.GET("/api/v1/order", handler.GetByIdOrder)
+	r.GET("/api/v1/order/:id", handler.GetByIdOrder)
 	r.PUT("/api/v1/order", handler.UpdateOrder)
-	r.DELETE("/api/v1/order", handler.DeleteOrder)
+	r.DELETE("/api/v1/order/:id", handler.DeleteOrder)
 	r.GET("/api/v1/orders", handler.GetAllOrder)
 
 	// order-products
 	r.POST("/api/v1/orderProduct", handler.CreateOrderProduct)
-	r.GET("/api/v1/orderProduct", handler.GetByIdOrderProduct)
+	r.GET("/api/v1/orderProduct/:id", handler.GetByIdOrderProduct)
 	r.PUT("/api/v1/orderProduct", handler.UpdateOrderProduct)
-	r.DELETE("/api/v1/orderProduct", handler.DeleteOrderProduct)
+	r.DELETE("/api/v1/orderProduct/:id", handler.DeleteOrderProduct)
 	r.GET("/api/v1/orderProducts", handler.GetAllOrderProducts)
 
 	// order-notes
 	r.POST("/api/v1/orderNote", handler.CreateOrderNotes)
-	r.GET("/api/v1/orderNote", handler.GetByIdOrderNotes)
+	r.GET("/api/v1/orderNote/:id", handler.GetByIdOrderNotes)
 	r.PUT("/api/v1/orderNote", handler.UpdateOrderNotes)
-	r.DELETE("/api/v1/orderNote", handler.DeleteOrderNotes)
+	r.DELETE("/api/v1/orderNote/:id", handler.DeleteOrderNotes)
 	r.GET("/api/v1/orderNotes", handler.GetAllOrderNotes)
 
 	// Shipper endpoints

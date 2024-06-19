@@ -18,18 +18,6 @@ definitions:
       user_id:
         type: string
     type: object
-  order_notes.GetListOrderNotesRequest:
-    properties:
-      limit:
-        type: integer
-      offset:
-        type: integer
-    type: object
-  order_notes.OrderNotesPrimaryKey:
-    properties:
-      id:
-        type: string
-    type: object
   order_notes.PaymentEnum:
     enum:
     - 0
@@ -70,18 +58,6 @@ definitions:
       price:
         type: number
       product_id:
-        type: string
-    type: object
-  order_product_service.GetListOrderProductRequest:
-    properties:
-      limit:
-        type: integer
-      offset:
-        type: integer
-    type: object
-  order_product_service.OrderProductPrimaryKey:
-    properties:
-      id:
         type: string
     type: object
   order_product_service.UpdateOrderProduct:
@@ -136,26 +112,12 @@ definitions:
       type:
         $ref: '#/definitions/order_service.TypeEnum'
     type: object
-  order_service.GetListOrderRequest:
-    properties:
-      limit:
-        type: integer
-      offset:
-        type: integer
-      searchByCustomerName:
-        type: string
-    type: object
   order_service.Location:
     properties:
       latitude:
         type: number
       longitude:
         type: number
-    type: object
-  order_service.OrderPrimaryKey:
-    properties:
-      id:
-        type: string
     type: object
   order_service.PaymentEnum:
     enum:
@@ -245,76 +207,6 @@ info:
   version: "1.0"
 paths:
   /api/v1/order:
-    delete:
-      consumes:
-      - application/json
-      description: API for delete an order
-      parameters:
-      - description: order
-        in: body
-        name: order
-        required: true
-        schema:
-          $ref: '#/definitions/order_service.OrderPrimaryKey'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.Response'
-      security:
-      - ApiKeyAuth: []
-      summary: Delete an order
-      tags:
-      - orders
-    get:
-      consumes:
-      - application/json
-      description: API for getting an order
-      parameters:
-      - description: order
-        in: body
-        name: order
-        required: true
-        schema:
-          $ref: '#/definitions/order_service.OrderPrimaryKey'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.Response'
-      security:
-      - ApiKeyAuth: []
-      summary: Get an order
-      tags:
-      - orders
     post:
       consumes:
       - application/json
@@ -385,18 +277,17 @@ paths:
       summary: Update an order
       tags:
       - orders
-  /api/v1/orderNote:
+  /api/v1/order/{id}:
     delete:
       consumes:
       - application/json
-      description: API for delete an order notes
+      description: API for delete an order
       parameters:
-      - description: order-notes
-        in: body
-        name: order
+      - description: id
+        in: path
+        name: id
         required: true
-        schema:
-          $ref: '#/definitions/order_notes.OrderNotesPrimaryKey'
+        type: string
       produces:
       - application/json
       responses:
@@ -418,20 +309,19 @@ paths:
             $ref: '#/definitions/models.Response'
       security:
       - ApiKeyAuth: []
-      summary: Delete an order notes
+      summary: Delete an order
       tags:
-      - order-notes
+      - orders
     get:
       consumes:
       - application/json
-      description: API for getting an order notes
+      description: API for getting an order
       parameters:
-      - description: order-notes
-        in: body
-        name: order
+      - description: id
+        in: path
+        name: id
         required: true
-        schema:
-          $ref: '#/definitions/order_notes.OrderNotesPrimaryKey'
+        type: string
       produces:
       - application/json
       responses:
@@ -453,9 +343,10 @@ paths:
             $ref: '#/definitions/models.Response'
       security:
       - ApiKeyAuth: []
-      summary: Get an order notes
+      summary: Get an order
       tags:
-      - order-notes
+      - orders
+  /api/v1/orderNote:
     post:
       consumes:
       - application/json
@@ -526,18 +417,89 @@ paths:
       summary: Update an order notes
       tags:
       - order-notes
+  /api/v1/orderNote/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: API for delete an order notes
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete an order notes
+      tags:
+      - order-notes
+    get:
+      consumes:
+      - application/json
+      description: API for getting an order notes
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get an order notes
+      tags:
+      - order-notes
   /api/v1/orderNotes:
     get:
       consumes:
       - application/json
       description: API for Get all order notes
       parameters:
-      - description: order-notes
-        in: body
-        name: order
-        required: true
-        schema:
-          $ref: '#/definitions/order_notes.GetListOrderNotesRequest'
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:
@@ -563,76 +525,6 @@ paths:
       tags:
       - order-notes
   /api/v1/orderProduct:
-    delete:
-      consumes:
-      - application/json
-      description: API for delete an order product
-      parameters:
-      - description: order-products
-        in: body
-        name: order
-        required: true
-        schema:
-          $ref: '#/definitions/order_product_service.OrderProductPrimaryKey'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.Response'
-      security:
-      - ApiKeyAuth: []
-      summary: Delete an order product
-      tags:
-      - order-products
-    get:
-      consumes:
-      - application/json
-      description: API for getting an order
-      parameters:
-      - description: order-products
-        in: body
-        name: order
-        required: true
-        schema:
-          $ref: '#/definitions/order_product_service.OrderProductPrimaryKey'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.Response'
-      security:
-      - ApiKeyAuth: []
-      summary: Get an order-product
-      tags:
-      - order-products
     post:
       consumes:
       - application/json
@@ -703,18 +595,89 @@ paths:
       summary: Update an order product
       tags:
       - order-products
+  /api/v1/orderProduct/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: API for delete an order product
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete an order product
+      tags:
+      - order-products
+    get:
+      consumes:
+      - application/json
+      description: API for getting an order
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get an order-product
+      tags:
+      - order-products
   /api/v1/orderProducts:
     get:
       consumes:
       - application/json
       description: API for Get all order products
       parameters:
-      - description: order-products
-        in: body
-        name: order
-        required: true
-        schema:
-          $ref: '#/definitions/order_product_service.GetListOrderProductRequest'
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:
@@ -745,12 +708,18 @@ paths:
       - application/json
       description: API for Get all orders
       parameters:
-      - description: order
-        in: body
-        name: order
-        required: true
-        schema:
-          $ref: '#/definitions/order_service.GetListOrderRequest'
+      - description: search
+        in: query
+        name: search
+        type: string
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:

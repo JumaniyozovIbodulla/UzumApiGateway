@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"strconv"
 	"uzumapi/api/models"
 	"uzumapi/config"
 	"uzumapi/pkg/grpc_client"
@@ -140,4 +141,35 @@ func handleResponse(c *gin.Context, log logger.Logger, msg string, statusCode in
 	resp.Data = data
 
 	c.JSON(resp.StatusCode, resp)
+}
+
+func ParsePageQueryParam(c *gin.Context) (int64, error) {
+	pageStr := c.Query("page")
+	if pageStr == "" {
+		pageStr = "1"
+	}
+	page, err := strconv.ParseInt(pageStr, 10, 30)
+	if err != nil {
+		return 0, err
+	}
+	if page == 0 {
+		return 1, nil
+	}
+	return page, nil
+}
+
+func ParseLimitQueryParam(c *gin.Context) (int64, error) {
+	limitStr := c.Query("limit")
+	if limitStr == "" {
+		limitStr = "10"
+	}
+	limit, err := strconv.ParseInt(limitStr, 10, 30)
+	if err != nil {
+		return 0, err
+	}
+
+	if limit == 0 {
+		return 10, nil
+	}
+	return limit, nil
 }
