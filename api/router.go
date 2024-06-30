@@ -22,7 +22,7 @@ type Config struct {
 	Cfg        config.Config
 }
 
-// @title           Swagger Example API
+// @title           Uzum Clone Api
 // @version         1.0
 // @description     This is a sample server celler server.
 // @termsOfService  http://swagger.io/terms/
